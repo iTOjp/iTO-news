@@ -1,49 +1,50 @@
 
 import streamlit as st
 import requests
-from googletrans import Translator
 from datetime import datetime
 
-st.set_page_config(page_title="世界ニュース翻訳ビューア", layout="wide")
-st.title("🌍 世界5カ国の代表メディア トップ10（翻訳つき）")
-st.caption(f"🔄 ビルド: version 0.3 / {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
+# --- 設定 ---
+API_KEY = "8091deb44d58406f4b38ea5b1b23fac4"
+COUNTRIES = {
+    "US": {"name": "アメリカ", "media": "CNN", "lang": "en"},
+    "DE": {"name": "ドイツ", "media": "Der Spiegel", "lang": "de"},
+    "FR": {"name": "フランス", "media": "Le Monde", "lang": "fr"},
+}
 
-translator = Translator()
+# --- ヘッダー ---
+st.set_page_config(page_title="世界ニュース比較ビューア", layout="wide")
+st.title("🌍 世界3か国の代表メディア トップ10（翻訳つき）")
 
-def fetch_and_display_news(name, media, domain, country_code, flag):
-    st.subheader(f"{flag} {name}のトップニュース（{media}）")
-    url = "https://newsdata.io/api/1/news"
+# --- バージョン表示 ---
+version = "0.4-mini"
+build_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+st.caption(f"📄 ビルド: version {version} / {build_time} JST")
+
+# --- ニュース取得関数 ---
+def fetch_news(country_code):
+    url = "https://gnews.io/api/v4/top-headlines"
     params = {
-        "apikey": "8091deb44d58406f4b38ea5b1b23fac4",
-        "domain": domain,
-        "language": "en",
-        "country": country_code
+        "lang": "en",
+        "country": country_code.lower(),
+        "max": 10,
+        "token": API_KEY,
     }
     try:
-        res = requests.get(url, params=params, timeout=10)
-        data = res.json()
-        articles = data.get("results") or []
-        if not isinstance(articles, list):
-            st.warning("記事が取得できませんでした。")
-            return
-        for idx, article in enumerate(articles[:10], 1):
-            title_en = article.get("title", "")
-            link = article.get("link", "#")
-            try:
-                title_ja = translator.translate(title_en, src="en", dest="ja").text
-            except:
-                title_ja = "(翻訳失敗) " + title_en
-            st.markdown(f"**{idx}. {title_ja}**  [原文]({link})")
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        return response.json().get("articles", [])
     except Exception as e:
-        st.warning(f"エラーが発生しました: {e}")
+        return f"エラー: {e}"
 
-media_sources = [
-    ("アメリカ", "CNN", "cnn.com", "us", "🇺🇸"),
-    ("ドイツ", "Der Spiegel", "spiegel.de", "de", "🇩🇪"),
-    ("フランス", "Le Monde", "lemonde.fr", "fr", "🇫🇷"),
-    ("中国", "Xinhua", "xinhuanet.com", "cn", "🇨🇳"),
-    ("日本", "NHK", "nhk.or.jp", "jp", "🇯🇵"),
-]
-
-for name, media, domain, cc, flag in media_sources:
-    fetch_and_display_news(name, media, domain, cc, flag)
+# --- 表示処理 ---
+for code, info in COUNTRIES.items():
+    st.subheader(f"{code} {info['name']}のトップニュース（{info['media']}）")
+    with st.spinner("取得中..."):
+        articles = fetch_news(code)
+        if isinstance(articles, str):
+            st.warning(f"{articles}")
+        elif articles:
+            for i, article in enumerate(articles):
+                st.markdown(f"{i+1}. [{article['title']}]({article['url']})")
+        else:
+            st.info("記事が取得できませんでした。")
