@@ -3,28 +3,27 @@ import streamlit as st
 import requests
 from googletrans import Translator
 
-st.set_page_config(page_title="iTO-news GNews正式版", layout="wide")
-
-st.title("🇺🇸 CNNの最新ニュース（GNews正式API）")
+st.set_page_config(page_title="iTO-news Newsdata仮版", layout="wide")
+st.title("🇺🇸 CNNのトップニュース（Newsdata仮API）")
 
 translator = Translator()
 
-url = "https://gnews.io/api/v4/search"
+url = "https://newsdata.io/api/1/news"
 params = {
-    "q": "site:cnn.com",
-    "lang": "en",
-    "max": 10,
-    "token": "8091deb44d58406f4b38ea5b1b23fac4"
+    "apikey": "pub_1234567890abcdef",
+    "domain": "cnn.com",
+    "language": "en",
+    "country": "us"
 }
 
 response = requests.get(url, params=params)
 data = response.json()
 
-if "articles" in data:
-    for idx, article in enumerate(data["articles"], 1):
+if "results" in data:
+    for idx, article in enumerate(data["results"][:10], 1):
         title_en = article.get("title", "")
         desc_en = article.get("description", "")
-        link = article.get("url", "#")
+        link = article.get("link", "#")
 
         try:
             title_ja = translator.translate(title_en, src='en', dest='ja').text
