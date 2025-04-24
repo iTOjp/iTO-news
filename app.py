@@ -1,36 +1,46 @@
 
 import streamlit as st
 import requests
-from bs4 import BeautifulSoup
 
-st.set_page_config(page_title="iTO News Viewer", layout="wide")
+VERSION = "0.4"
+BUILD_TIME = "2025-04-24 17:25:12 JST"
 
-st.title("🌍 世界のニュース比較ビューア")
-st.markdown("トップニュースを世界各国のメディアで比較。日本語で要約し、原文にもアクセスできます。")
+def translate_to_japanese(text):
+    return text
 
-# 表示対象のニュース（仮で手動定義）
-articles = [
-    {
-        "title": "米大統領、ウクライナへの追加支援を表明",
-        "sources": {
-            "BBC": "https://www.bbc.com/news/world-123456",
-            "CNN": "https://edition.cnn.com/2024/04/20/world/ukraine-aid-us/index.html",
-            "NHK": "https://www3.nhk.or.jp/news/html/20240420/k100123456789.html"
-        }
-    },
-    {
-        "title": "インドで大規模な選挙が開始",
-        "sources": {
-            "BBC": "https://www.bbc.com/news/world-asia-india-123456",
-            "The Hindu": "https://www.thehindu.com/news/national/india-election-2024/article123456.ece",
-            "NHK": "https://www3.nhk.or.jp/news/html/20240419/k100123456788.html"
-        }
-    }
+news_sources = [
+    {"country": "us", "lang": "en", "name": "アメリカ", "media": "代表メディア"},
+    {"country": "de", "lang": "de", "name": "ドイツ", "media": "代表メディア"},
+    {"country": "fr", "lang": "fr", "name": "フランス", "media": "代表メディア"},
+    {"country": "cn", "lang": "zh", "name": "中国", "media": "代表メディア"},
+    {"country": "jp", "lang": "ja", "name": "日本", "media": "代表メディア"},
 ]
 
-for article in articles:
-    st.subheader(article["title"])
-    for source, url in article["sources"].items():
-        st.markdown(f"- [{source}]({url})")
+API_KEY = "8091deb44d58406f4b38ea5b1b23fac4"
+API_URL = "https://gnews.io/api/v4/top-headlines"
 
-st.info("※ 本アプリはニュース構造のモック版です。リアルタイム取得や翻訳は次フェーズで拡張可能です。")
+st.set_page_config(page_title="世界ニュース比較ビューア", layout="wide")
+st.title("🌍 世界5カ国の代表メディア トップ10（翻訳つき）")
+st.caption(f"📄 ビルド: version {VERSION} / {BUILD_TIME}")
+
+for info in news_sources:
+    st.subheader(f"{info['country'].upper()} {info['name']}のトップニュース（{info['media']}）")
+    params = {
+        "apikey": API_KEY,
+        "country": info["country"],
+        "lang": info["lang"],
+        "max": 10,
+    }
+    try:
+        res = requests.get(API_URL, params=params, timeout=10)
+        data = res.json()
+        articles = data.get("articles", [])
+        if not isinstance(articles, list) or not articles:
+            st.warning("記事が取得できませんでした。")
+            continue
+        for i, article in enumerate(articles[:10], 1):
+            title = article.get("title", "No Title")
+            url = article.get("url", "#")
+            st.markdown(f"{i}. [{translate_to_japanese(title)}]({url})")
+    except Exception as e:
+        st.error(f"⚠️ ニュース取得時にエラーが発生しました: {e}")
