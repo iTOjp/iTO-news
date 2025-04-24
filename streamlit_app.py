@@ -2,10 +2,11 @@
 import streamlit as st
 import requests
 from googletrans import Translator
+from datetime import datetime
 
 st.set_page_config(page_title="世界ニュース翻訳ビューア", layout="wide")
 st.title("🌍 世界5カ国の代表メディア トップ10（翻訳つき）")
-st.caption("🔄 ビルド: version 0.2 / 2025-04-25 00:42 JST")
+st.caption(f"🔄 ビルド: version 0.3 / {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
 translator = Translator()
 
@@ -13,7 +14,7 @@ def fetch_and_display_news(name, media, domain, country_code, flag):
     st.subheader(f"{flag} {name}のトップニュース（{media}）")
     url = "https://newsdata.io/api/1/news"
     params = {
-        "apikey": "pub_1234567890abcdef",
+        "apikey": "8091deb44d58406f4b38ea5b1b23fac4",
         "domain": domain,
         "language": "en",
         "country": country_code
@@ -22,8 +23,8 @@ def fetch_and_display_news(name, media, domain, country_code, flag):
         res = requests.get(url, params=params, timeout=10)
         data = res.json()
         articles = data.get("results") or []
-        if not articles:
-            st.info("記事が取得できませんでした。")
+        if not isinstance(articles, list):
+            st.warning("記事が取得できませんでした。")
             return
         for idx, article in enumerate(articles[:10], 1):
             title_en = article.get("title", "")
@@ -36,8 +37,13 @@ def fetch_and_display_news(name, media, domain, country_code, flag):
     except Exception as e:
         st.warning(f"エラーが発生しました: {e}")
 
-fetch_and_display_news("アメリカ", "CNN", "cnn.com", "us", "🇺🇸")
-fetch_and_display_news("ドイツ", "Der Spiegel", "spiegel.de", "de", "🇩🇪")
-fetch_and_display_news("フランス", "Le Monde", "lemonde.fr", "fr", "🇫🇷")
-fetch_and_display_news("中国", "Xinhua", "xinhuanet.com", "cn", "🇨🇳")
-fetch_and_display_news("日本", "NHK", "nhk.or.jp", "jp", "🇯🇵")
+media_sources = [
+    ("アメリカ", "CNN", "cnn.com", "us", "🇺🇸"),
+    ("ドイツ", "Der Spiegel", "spiegel.de", "de", "🇩🇪"),
+    ("フランス", "Le Monde", "lemonde.fr", "fr", "🇫🇷"),
+    ("中国", "Xinhua", "xinhuanet.com", "cn", "🇨🇳"),
+    ("日本", "NHK", "nhk.or.jp", "jp", "🇯🇵"),
+]
+
+for name, media, domain, cc, flag in media_sources:
+    fetch_and_display_news(name, media, domain, cc, flag)
