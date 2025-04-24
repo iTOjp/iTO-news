@@ -3,9 +3,9 @@ import streamlit as st
 import requests
 from googletrans import Translator
 
-st.set_page_config(page_title="iTO-news GNews仮版", layout="wide")
+st.set_page_config(page_title="iTO-news GNews正式版", layout="wide")
 
-st.title("🇺🇸 CNNの最新ニュース（GNews仮API）")
+st.title("🇺🇸 CNNの最新ニュース（GNews正式API）")
 
 translator = Translator()
 
@@ -14,7 +14,7 @@ params = {
     "q": "site:cnn.com",
     "lang": "en",
     "max": 10,
-    "token": "demo"
+    "token": "8091deb44d58406f4b38ea5b1b23fac4"
 }
 
 response = requests.get(url, params=params)
