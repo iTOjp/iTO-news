@@ -1,44 +1,44 @@
 
 import streamlit as st
-import feedparser
+import requests
 from googletrans import Translator
 
-st.set_page_config(page_title="iTO-news (米国ニュース調査版)", layout="wide")
+st.set_page_config(page_title="iTO-news GNews仮版", layout="wide")
 
-st.title("🇺🇸 アメリカのトップニュース（CNN）")
-
-rss_url = "https://rss.cnn.com/rss/cnn_topstories.rss"
-feed = feedparser.parse(rss_url)
-
-# DEBUG: RSSの中身を表示
-st.subheader("🔍 DEBUG: RSS取得結果（feed.entries）")
-st.write(feed.entries)
+st.title("🇺🇸 CNNの最新ニュース（GNews仮API）")
 
 translator = Translator()
 
-with st.spinner("ニュースを取得して翻訳中です..."):
-    news = []
-    for entry in feed.entries[:10]:
-        title_en = entry.title
-        summary_en = entry.summary if 'summary' in entry else ""
-        link = entry.link
+url = "https://gnews.io/api/v4/search"
+params = {
+    "q": "site:cnn.com",
+    "lang": "en",
+    "max": 10,
+    "token": "demo"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+if "articles" in data:
+    for idx, article in enumerate(data["articles"], 1):
+        title_en = article.get("title", "")
+        desc_en = article.get("description", "")
+        link = article.get("url", "#")
 
         try:
             title_ja = translator.translate(title_en, src='en', dest='ja').text
-            summary_ja = translator.translate(summary_en, src='en', dest='ja').text
-        except Exception as e:
+        except:
             title_ja = "(翻訳エラー) " + title_en
-            summary_ja = "(翻訳エラー) " + summary_en
-            st.error(f"翻訳エラー: {e}")
 
-        news.append({
-            "title_ja": title_ja,
-            "summary_ja": summary_ja,
-            "link": link
-        })
+        try:
+            desc_ja = translator.translate(desc_en, src='en', dest='ja').text
+        except:
+            desc_ja = "(翻訳エラー) " + desc_en
 
-for idx, item in enumerate(news, 1):
-    st.markdown(f"### {idx}. {item['title_ja']}")
-    st.write(item['summary_ja'])
-    st.markdown(f"[原文リンクはこちら]({item['link']})")
-    st.markdown("---")
+        st.markdown("### {}. {}".format(idx, title_ja))
+        st.write(desc_ja)
+        st.markdown("[原文リンクはこちら]({})".format(link))
+        st.markdown("---")
+else:
+    st.warning("ニュースデータが取得できませんでした。APIキーまたは通信環境をご確認ください。")
