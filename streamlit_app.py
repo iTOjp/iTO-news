@@ -20,7 +20,7 @@ def fetch_and_display_news(name, media, domain, country_code, flag):
     try:
         res = requests.get(url, params=params, timeout=10)
         data = res.json()
-        articles = data.get("results", [])
+        articles = data.get("results") or []
         if not articles:
             st.info("記事が取得できませんでした。")
             return
