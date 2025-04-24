@@ -26,6 +26,7 @@ with st.spinner("ニュースを取得して翻訳中です..."):
         except Exception as e:
             title_ja = "(翻訳エラー) " + title_en
             summary_ja = "(翻訳エラー) " + summary_en
+            st.error(f"翻訳エラー: {e}")
 
         news.append({
             "title_ja": title_ja,
