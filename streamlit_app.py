@@ -3,16 +3,19 @@ import streamlit as st
 import feedparser
 from googletrans import Translator
 
-st.set_page_config(page_title="iTO-news (米国ニュース試作)", layout="wide")
+st.set_page_config(page_title="iTO-news (米国ニュース調査版)", layout="wide")
 
 st.title("🇺🇸 アメリカのトップニュース（CNN）")
 
-# CNN RSS フィード URL
 rss_url = "https://rss.cnn.com/rss/cnn_topstories.rss"
 feed = feedparser.parse(rss_url)
+
+# DEBUG: RSSの中身を表示
+st.subheader("🔍 DEBUG: RSS取得結果（feed.entries）")
+st.write(feed.entries)
+
 translator = Translator()
 
-# ニュース取得と翻訳
 with st.spinner("ニュースを取得して翻訳中です..."):
     news = []
     for entry in feed.entries[:10]:
@@ -34,7 +37,6 @@ with st.spinner("ニュースを取得して翻訳中です..."):
             "link": link
         })
 
-# 表示
 for idx, item in enumerate(news, 1):
     st.markdown(f"### {idx}. {item['title_ja']}")
     st.write(item['summary_ja'])
