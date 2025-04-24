@@ -1,50 +1,42 @@
 
 import streamlit as st
 import requests
+from googletrans import Translator
 from datetime import datetime
 
-# --- 設定 ---
 API_KEY = "8091deb44d58406f4b38ea5b1b23fac4"
-COUNTRIES = {
-    "US": {"name": "アメリカ", "media": "CNN", "lang": "en"},
-    "DE": {"name": "ドイツ", "media": "Der Spiegel", "lang": "de"},
-    "FR": {"name": "フランス", "media": "Le Monde", "lang": "fr"},
+API_URL = "https://gnews.io/api/v4/top-headlines"
+
+st.set_page_config(page_title="米国ニュース翻訳ビューア", layout="wide")
+st.title("🇺🇸 アメリカのトップニュース（翻訳つき）")
+st.caption("📄 version 0.3-us / build: 2025-04-24 17:31:35 JST")
+
+translator = Translator()
+
+params = {
+    "token": API_KEY,
+    "country": "us",
+    "lang": "en",
+    "max": 10,
 }
 
-# --- ヘッダー ---
-st.set_page_config(page_title="世界ニュース比較ビューア", layout="wide")
-st.title("🌍 世界3か国の代表メディア トップ10（翻訳つき）")
+try:
+    st.info("ニュースを取得しています...")
+    res = requests.get(API_URL, params=params, timeout=10)
+    res.raise_for_status()
+    data = res.json()
+    articles = data.get("articles", [])
 
-# --- バージョン表示 ---
-version = "0.4-mini"
-build_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-st.caption(f"📄 ビルド: version {version} / {build_time} JST")
-
-# --- ニュース取得関数 ---
-def fetch_news(country_code):
-    url = "https://gnews.io/api/v4/top-headlines"
-    params = {
-        "lang": "en",
-        "country": country_code.lower(),
-        "max": 10,
-        "token": API_KEY,
-    }
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        return response.json().get("articles", [])
-    except Exception as e:
-        return f"エラー: {e}"
-
-# --- 表示処理 ---
-for code, info in COUNTRIES.items():
-    st.subheader(f"{code} {info['name']}のトップニュース（{info['media']}）")
-    with st.spinner("取得中..."):
-        articles = fetch_news(code)
-        if isinstance(articles, str):
-            st.warning(f"{articles}")
-        elif articles:
-            for i, article in enumerate(articles):
-                st.markdown(f"{i+1}. [{article['title']}]({article['url']})")
-        else:
-            st.info("記事が取得できませんでした。")
+    if not isinstance(articles, list) or not articles:
+        st.warning("記事が取得できませんでした。")
+    else:
+        for idx, article in enumerate(articles, 1):
+            title_en = article.get("title", "")
+            url = article.get("url", "#")
+            try:
+                title_ja = translator.translate(title_en, src="en", dest="ja").text
+            except:
+                title_ja = "(翻訳失敗) " + title_en
+            st.markdown(f"**{idx}. {title_ja}**  [原文]({url})")
+except Exception as e:
+    st.error(f"⚠️ エラーが発生しました: {e}")
