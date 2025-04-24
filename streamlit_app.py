@@ -1,53 +1,52 @@
 
 import streamlit as st
+import requests
+from googletrans import Translator
 
 st.set_page_config(page_title="世界ニュース翻訳ビューア", layout="wide")
 st.title("🌍 世界3か国の代表メディア トップ10（翻訳つき）")
-st.caption("📄 version 0.5 / build: 2025-04-25 02:38:02 JST")
+st.caption("📄 version 0.6 / build: 2025-04-25 02:38:02 JST")
 
-# 仮データ定義
-mock_data = {
-    "アメリカ（CNN）": [
-        "バイデン大統領がAI規制を発表",
-        "トランプ氏が再選出馬を正式表明",
-        "Appleが新型iPhoneを発表",
-        "米中関係に新たな緊張",
-        "ウォール街で株価が急落",
-        "テキサスで洪水被害拡大",
-        "NASAが火星探査計画を更新",
-        "アメリカ、移民政策を見直し",
-        "米国内でAI倫理問題が議論に",
-        "スーパー火星望遠鏡、宇宙に打ち上げ"
-    ],
-    "ドイツ（Der Spiegel）": [
-        "ドイツ経済、予想以上の成長",
-        "移民受け入れ政策に議論",
-        "ベルリンで大規模デモ",
-        "エネルギー転換計画が前進",
-        "EU予算交渉が難航",
-        "気候変動対策法案が成立",
-        "鉄道ストライキ続く",
-        "コロナ規制の段階的解除へ",
-        "ドイツ製電気自動車が話題に",
-        "首相が中国を訪問"
-    ],
-    "フランス（Le Monde）": [
-        "年金改革に抗議のストライキ",
-        "パリで労働者デモ",
-        "マクロン大統領の支持率低下",
-        "新型原発建設が承認",
-        "文化遺産保護法案が審議入り",
-        "仏経済回復に明るい兆し",
-        "南仏で山火事が拡大",
-        "新学期に新たな教育改革",
-        "フランス軍、アフリカから撤退",
-        "仏国内でテロ未遂事件が摘発"
-    ]
-}
+translator = Translator()
 
-# 表示処理
-for country, headlines in mock_data.items():
-    st.subheader(f"📰 {country}")
-    for idx, title in enumerate(headlines, 1):
-        st.markdown(f"**{idx}. {title}**  [原文](#)")
+news_sources = [
+    {"country": "us", "media": "CNN", "domain": "cnn.com", "flag": "🇺🇸"},
+    {"country": "de", "media": "Der Spiegel", "domain": "spiegel.de", "flag": "🇩🇪"},
+    {"country": "fr", "media": "Le Monde", "domain": "lemonde.fr", "flag": "🇫🇷"},
+]
+
+API_KEY = "8091deb44d58406f4b38ea5b1b23fac4"
+
+def fetch_news(domain):
+    url = "https://newsdata.io/api/1/news"
+    params = {
+        "apikey": API_KEY,
+        "domain": domain,
+        "language": "en",
+    }
+    try:
+        res = requests.get(url, params=params, timeout=10)
+        res.raise_for_status()
+        return res.json().get("results", [])
+    except Exception as e:
+        return f"エラー: {str(e)}"
+
+for source in news_sources:
+    st.subheader(f"{source['flag']} {source['media']}（{source['country'].upper()}）のトップニュース")
+    with st.spinner("取得中..."):
+        result = fetch_news(source["domain"])
+        if isinstance(result, str):
+            st.warning(result)
+            continue
+        if not result:
+            st.info("記事が取得できませんでした。")
+            continue
+        for idx, article in enumerate(result[:10], 1):
+            title = article.get("title", "")
+            link = article.get("link", "#")
+            try:
+                title_ja = translator.translate(title, src="en", dest="ja").text
+            except:
+                title_ja = "(翻訳失敗) " + title
+            st.markdown(f"**{idx}. {title_ja}** [原文]({link})")
     st.markdown("---")
