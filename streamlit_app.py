@@ -1,12 +1,9 @@
 
 import streamlit as st
 import requests
-from googletrans import Translator
 
-st.set_page_config(page_title="iTO-news Newsdata仮版", layout="wide")
-st.title("🇺🇸 CNNのトップニュース（Newsdata仮API）")
-
-translator = Translator()
+st.set_page_config(page_title="iTO-news Newsdata動作確認版", layout="wide")
+st.title("🇺🇸 CNNのトップニュース（翻訳なし・英語表示）")
 
 url = "https://newsdata.io/api/1/news"
 params = {
@@ -21,23 +18,13 @@ data = response.json()
 
 if "results" in data:
     for idx, article in enumerate(data["results"][:10], 1):
-        title_en = article.get("title", "")
-        desc_en = article.get("description", "")
+        title = article.get("title", "")
+        desc = article.get("description", "")
         link = article.get("link", "#")
 
-        try:
-            title_ja = translator.translate(title_en, src='en', dest='ja').text
-        except:
-            title_ja = "(翻訳エラー) " + title_en
-
-        try:
-            desc_ja = translator.translate(desc_en, src='en', dest='ja').text
-        except:
-            desc_ja = "(翻訳エラー) " + desc_en
-
-        st.markdown("### {}. {}".format(idx, title_ja))
-        st.write(desc_ja)
-        st.markdown("[原文リンクはこちら]({})".format(link))
+        st.markdown("### {}. {}".format(idx, title))
+        st.write(desc)
+        st.markdown("[Original article]({})".format(link))
         st.markdown("---")
 else:
     st.warning("ニュースデータが取得できませんでした。APIキーまたは通信環境をご確認ください。")
