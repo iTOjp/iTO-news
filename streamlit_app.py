@@ -5,6 +5,7 @@ from googletrans import Translator
 
 st.set_page_config(page_title="世界ニュース翻訳ビューア", layout="wide")
 st.title("🌍 世界5カ国の代表メディア トップ10（翻訳つき）")
+st.caption("🔄 ビルド: version 0.2 / 2025-04-25 00:42 JST")
 
 translator = Translator()
 
