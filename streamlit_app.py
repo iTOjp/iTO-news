@@ -20,7 +20,7 @@ def translate(text, target_lang="JA"):
     except Exception as e:
         return f"[翻訳エラー: {e}]"
 
-st.set_page_config(page_title="世界の代表メディア 最新ニュース（翻訳あり）", layout="wide")
+st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース（翻訳あり）", layout="wide")
 st.title("🗞️ 世界の代表メディア 最新ニュース（日本語翻訳付き）")
 st.caption(f"version 1.1.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
