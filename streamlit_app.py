@@ -65,7 +65,8 @@ h1, h2, .stMarkdown {
     margin-top: 2em;
     margin-bottom: 1em;
 }
-#MainMenu, footer, .viewerBadge_container__1QSob {
+/* Streamlitの下部ロゴ・バッジ完全非表示 */
+#MainMenu, footer, .viewerBadge_container__1QSob, .viewerBadge_link__qRIco {
     visibility: hidden;
     display: none;
 }
@@ -73,15 +74,8 @@ h1, h2, .stMarkdown {
 """, unsafe_allow_html=True)
 
 st.title("💖 愛輝！世界の代表メディア 最新ニュース")
-st.caption(f"version 1.9.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
+st.caption(f"version 1.9.2 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 st.caption("produced by Akihiro ITO")
-
-if "points" not in st.session_state:
-    st.session_state.points = 0
-if "clicked_articles" not in st.session_state:
-    st.session_state.clicked_articles = set()
-
-st.markdown(f"💎 現在の興味ポイント: **{st.session_state.points} pt**")
 
 MEDIA_FEEDS = {
     "🌐 Reuters（世界）": "https://news.google.com/rss/search?q=site:reuters.com&hl=en-US&gl=US&ceid=US:en",
@@ -104,8 +98,6 @@ for name, url in MEDIA_FEEDS.items():
         if feed.entries:
             for i, entry in enumerate(feed.entries[:3], 1):
                 translated = translate(entry.title)
-                article_id = entry.link
-
                 card_html = f'''
 <div class="card">
 <strong>{i}. {translated}</strong><br>
@@ -114,14 +106,6 @@ for name, url in MEDIA_FEEDS.items():
 </div>
 '''
                 st.markdown(card_html, unsafe_allow_html=True)
-
-                if article_id not in st.session_state.clicked_articles:
-                    if st.button("👆この記事に興味あり！", key=article_id):
-                        st.session_state.points += 1
-                        st.session_state.clicked_articles.add(article_id)
-                else:
-                    st.markdown("✅ このニュースはすでに記録されています。")
-
                 time.sleep(0.1)
         else:
             st.warning("記事が取得できませんでした。")
