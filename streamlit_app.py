@@ -13,18 +13,20 @@ def translate(text):
 
 st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
 st.title("愛輝！世界の代表メディア 最新ニュース")
-st.caption(f"version 1.3.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
+st.caption(f"version 1.4.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
 MEDIA_FEEDS = {
     "BBC News（イギリス）": "http://feeds.bbci.co.uk/news/rss.xml",
-    "Reuters（Google経由・国際）": "https://news.google.com/rss/search?q=site:reuters.com&hl=en-US&gl=US&ceid=US:en",
+    "CNN（Google経由・アメリカ）": "https://news.google.com/rss/search?q=site:cnn.com&hl=en-US&gl=US&ceid=US:en",
     "The New York Times（アメリカ）": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-    "The Washington Post（アメリカ）": "http://feeds.washingtonpost.com/rss/national",
     "Le Monde（フランス）": "https://www.lemonde.fr/rss/une.xml",
     "Der Spiegel（ドイツ）": "https://www.spiegel.de/international/index.rss",
-    "中国網（中国）": "http://www.china.org.cn/rss/china_rss.xml",
+    "CGTN（中国）": "https://www.cgtn.com/rss/",
     "Folha de S.Paulo（ブラジル）": "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml",
-    "NHKニュース（日本）": "https://www3.nhk.or.jp/rss/news/cat0.xml"
+    "NHKニュース（日本）": "https://www3.nhk.or.jp/rss/news/cat0.xml",
+    "TASS（ロシア）": "https://tass.com/rss/v2.xml",
+    "Al Jazeera（カタール）": "https://www.aljazeera.com/xml/rss/all.xml",
+    "Reuters（Google経由・国際）": "https://news.google.com/rss/search?q=site:reuters.com&hl=en-US&gl=US&ceid=US:en"
 }
 
 for name, url in MEDIA_FEEDS.items():
