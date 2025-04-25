@@ -1,21 +1,21 @@
 import streamlit as st
 import feedparser
+from datetime import datetime
 
-st.set_page_config(page_title="CNNニュース翻訳ビューア", layout="wide")
-st.title("📰 CNN トップニュース（翻訳なし）")
-st.caption("version 1.0 / CNN RSSフィードより取得")
+st.set_page_config(page_title="Washington Postニュースビューア", layout="wide")
 
-# CNN RSSフィードURL
-rss_url = "https://rss.cnn.com/rss/cnn_topstories.rss"
+st.title("📰 Washington Post トップニュース（RSS）")
+st.caption("version 1.0 / built: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-# RSSパース
-feed = feedparser.parse(rss_url)
+RSS_URL = "https://feeds.washingtonpost.com/rss/world"
 
-if not feed.entries:
-    st.error("RSSフィードを取得できませんでした。")
+with st.status("ニュースを取得しています...", expanded=False):
+    feed = feedparser.parse(RSS_URL)
+
+if feed.bozo:
+    st.error("RSSの取得に失敗しました。通信環境をご確認ください。")
 else:
-    for i, entry in enumerate(feed.entries[:10], 1):
-        title = entry.title
-        link = entry.link
-        st.markdown(f"**{i}. {title}**  
-[原文はこちら]({link})")
+    entries = feed.entries[:10]
+    for i, entry in enumerate(entries, 1):
+        st.markdown(f"**{i}. {entry.title}**")
+        st.markdown(f"[🔗 原文リンク]({entry.link})")
