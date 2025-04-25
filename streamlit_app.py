@@ -1,5 +1,9 @@
+
 import streamlit as st
 from streamlit.components.v1 import html
+
+# ✅ set_page_config は一番最初に
+st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
 
 # 💫 ラメエフェクト
 html("""
@@ -39,8 +43,6 @@ document.head.appendChild(style);
 """, height=0)
 
 # 🌟 アプリ本体
-st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
-
 st.title("🌏 愛輝！世界の代表メディア 最新ニュース")
 st.markdown("翻訳付きで各国メディアのトップ記事をチェックできます。")
 
