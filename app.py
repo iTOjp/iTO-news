@@ -1,21 +1,27 @@
+
 import streamlit as st
-import feedparser
+import requests
 from datetime import datetime
+import feedparser
 
-st.set_page_config(page_title="Washington Post ニュース", layout="wide")
+MEDIA_FEEDS = {
+    "BBC News（イギリス）": "http://feeds.bbci.co.uk/news/rss.xml",
+    "Reuters（イギリス）": "http://feeds.reuters.com/reuters/topNews",
+    "The New York Times（アメリカ）": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+    "The Washington Post（アメリカ）": "http://feeds.washingtonpost.com/rss/national"
+}
 
-st.title("📰 Washington Post ニュースビューア（RSS）")
-st.caption("version 1.0 / built: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+st.set_page_config(page_title="世界の代表メディア 最新ニュース（翻訳なし）", layout="wide")
+st.title("🗞️ 世界の代表メディア 最新ニュース（翻訳なし）")
+st.caption(f"version 1.0.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
-RSS_URL = "https://www.washingtonpost.com/rss/homepage"
-
-with st.status("RSSからニュースを取得中...", expanded=False):
-    feed = feedparser.parse(RSS_URL)
-
-if feed.bozo:
-    st.error("RSSの取得に失敗しました。通信環境をご確認ください。")
-else:
-    entries = feed.entries[:10]
-    for i, entry in enumerate(entries, 1):
-        st.markdown(f"**{i}. {entry.title}**")
-        st.markdown(f"[🔗 記事を読む]({entry.link})")
+for name, url in MEDIA_FEEDS.items():
+    st.subheader(name)
+    with st.spinner("ニュースを取得しています…"):
+        feed = feedparser.parse(url)
+        if feed.entries:
+            for i, entry in enumerate(feed.entries[:10], 1):
+                st.markdown(f"**{i}. {entry.title}**")
+                st.markdown(f"[原文を読む]({entry.link})")
+        else:
+            st.error("ニュース記事を取得できませんでした。")

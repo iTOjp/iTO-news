@@ -1,13 +1,2 @@
-このアプリは、newsdata.ioのAPIを利用して、アメリカ（CNN）、ドイツ（Der Spiegel）、フランス（Le Monde）のトップニュース10件を翻訳なしで一覧表示するStreamlitアプリです。
-
-【バージョン】
-version 0.9.3
-
-【構成ファイル】
-- app.py : Streamlitアプリの本体
-- README.txt : この説明書
-
-【使い方】
-1. ZIPを展開し、GitHub上にプッシュしてください。
-2. Streamlit Cloudで新規アプリとしてデプロイします。
-3. 表示されたニュースを確認できます。
+このアプリはBBC News、Reuters、New York Times、Washington PostのRSSフィードを使って、最新ニュースのタイトルを日本語環境でも簡潔に閲覧できるように構成されたStreamlitアプリです。
+翻訳機能は未実装で、原文リンクを併記しています。
