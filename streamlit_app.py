@@ -36,7 +36,7 @@ def translate(text):
     except:
         return "[翻訳失敗]"
 
-st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
+st.set_page_config(page_title="愛輝！世界の最新ニュース", layout="wide")
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] {
@@ -66,7 +66,7 @@ h1, h2, .stMarkdown {
 </style>
 """, unsafe_allow_html=True)
 
-st.title("💖 愛輝！世界の代表メディア 最新ニュース")
+st.title("💖 愛輝！世界の最新ニュース")
 st.caption(f"version 1.8.1 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
 MEDIA_FEEDS = {
