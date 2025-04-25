@@ -1,36 +1,33 @@
 import streamlit as st
-import requests
+import feedparser
 from datetime import datetime
+import urllib.parse
 
-API_KEY = "pub_828414f2650027ef032005a0dc43452796878"  # これは検証後、有効性が必要
-
-# 今回は1メディアに限定
-DOMAINS = {
-    "ワシントン・ポスト（The Washington Post）": "washingtonpost.com"
-}
-
-st.set_page_config(page_title="ワシントンポスト ニュース", layout="wide")
+# ✅ アプリの設定
+st.set_page_config(page_title="ワシントンポストの最新ニュース", layout="wide")
 st.title("📰 ワシントンポストの最新ニュース（翻訳なし）")
 st.caption(f"version 0.9.3 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 
-def fetch_news(domain):
-    url = f"https://newsdata.io/api/1/news?apikey={API_KEY}&domain={domain}&language=en"
+# ✅ RSS URL（Washington Post の RSS フィード）
+RSS_URL = "https://feeds.washingtonpost.com/rss/national"
+
+# ✅ ニュースを取得する関数
+def fetch_rss(url):
     try:
-        res = requests.get(url, timeout=10)
-        res.raise_for_status()
-        return res.json().get("results", [])
+        feed = feedparser.parse(url)
+        return feed.entries[:10]
     except Exception as e:
-        return f"エラー: {e}"
+        st.error(f"ニュース取得エラー: {e}")
+        return []
 
-for name, domain in DOMAINS.items():
-    st.subheader(name)
-    with st.spinner("ニュースを取得しています..."):
-        news = fetch_news(domain)
+# ✅ 表示処理
+with st.spinner("ニュースを取得しています..."):
+    articles = fetch_rss(RSS_URL)
 
-    if isinstance(news, str):
-        st.error(news)
-    elif not news:
-        st.warning("記事が取得できませんでした。")
-    else:
-        for idx, article in enumerate(news[:10], 1):
-            st.markdown(f"{idx}. [{article.get('title')}]({article.get('link')})")
+if articles:
+    for i, entry in enumerate(articles, 1):
+        st.markdown(f"**{i}. {entry.title}**")
+        st.markdown(f"[原文を見る]({entry.link})")
+        st.markdown("---")
+else:
+    st.warning("記事を取得できませんでした。")
