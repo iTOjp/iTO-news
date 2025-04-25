@@ -38,7 +38,7 @@ def translate(text):
         return "[翻訳失敗]"
 
 # ✅ ページ構成とデザイン
-st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
+st.set_page_config(page_title="愛輝！世界の最新ニュース", layout="wide")
 
 st.markdown("""
 <style>
@@ -75,7 +75,7 @@ h1, h2, .stMarkdown {
 """, unsafe_allow_html=True)
 
 # ✅ ヘッダー表示
-st.title("💖 愛輝！世界の代表メディア 最新ニュース")
+st.title("💖 愛輝！世界の最新ニュース")
 st.caption(f"version 1.8.1 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 st.caption("produced by Akihiro ITO")
 
