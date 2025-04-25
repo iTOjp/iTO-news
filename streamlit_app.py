@@ -66,7 +66,6 @@ h1, h2, .stMarkdown {
     margin-top: 2em;
     margin-bottom: 1em;
 }
-/* 👇 ストリームリットのロゴ等非表示 */
 #MainMenu, footer, .viewerBadge_container__1QSob {
     visibility: hidden;
     display: none;
@@ -74,10 +73,17 @@ h1, h2, .stMarkdown {
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ ヘッダー表示
 st.title("💖 愛輝！世界の代表メディア 最新ニュース")
-st.caption(f"version 1.8.1 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
+st.caption(f"version 1.9.0 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 st.caption("produced by Akihiro ITO")
+
+# ✅ ポイント管理の初期化
+if "points" not in st.session_state:
+    st.session_state.points = 0
+if "clicked_articles" not in st.session_state:
+    st.session_state.clicked_articles = set()
+
+st.markdown(f"💎 現在の興味ポイント: **{st.session_state.points} pt**")
 
 # ✅ ニュースフィード定義
 MEDIA_FEEDS = {
@@ -94,7 +100,6 @@ MEDIA_FEEDS = {
     "🇦🇺 ABC News（豪）": "https://www.abc.net.au/news/feed/51120/rss.xml"
 }
 
-# ✅ 表示処理
 for name, url in MEDIA_FEEDS.items():
     st.markdown(f"<div class='media-block'><h3>{name}</h3></div>", unsafe_allow_html=True)
     with st.spinner("ニュースを取得中..."):
@@ -102,14 +107,24 @@ for name, url in MEDIA_FEEDS.items():
         if feed.entries:
             for i, entry in enumerate(feed.entries[:3], 1):
                 translated = translate(entry.title)
+                article_id = entry.link
+
                 card_html = f'''
 <div class="card">
-<b>{i}. {translated}</b><br>
+<strong>{i}. {translated}</strong><br>
 <code>{entry.title}</code><br>
 <a href="{entry.link}" target="_blank">&#128279; 原文を読む</a>
 </div>
 '''
                 st.markdown(card_html, unsafe_allow_html=True)
+
+                if article_id not in st.session_state.clicked_articles:
+                    if st.button("👆この記事に興味あり！", key=article_id):
+                        st.session_state.points += 1
+                        st.session_state.clicked_articles.add(article_id)
+                else:
+                    st.markdown("✅ このニュースはすでに記録されています。")
+
                 time.sleep(0.1)
         else:
             st.warning("記事が取得できませんでした。")
