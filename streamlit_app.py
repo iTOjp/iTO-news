@@ -1,6 +1,6 @@
 
 import streamlit as st
-st.set_page_config(page_title="愛輝！世界の代表メディア 最新ニュース", layout="wide")
+st.set_page_config(page_title="愛輝！世界の最新ニュース", layout="wide")
 
 import feedparser
 from datetime import datetime
@@ -73,7 +73,7 @@ h1, h2, .stMarkdown {
 </style>
 """, unsafe_allow_html=True)
 
-st.title("💖 愛輝！世界の代表メディア 最新ニュース")
+st.title("💖 愛輝！世界の最新ニュース")
 st.caption(f"version 1.9.2 / build: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} JST")
 st.caption("produced by Akihiro ITO")
 
