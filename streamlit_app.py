@@ -1,3 +1,48 @@
+
+import streamlit as st
+from streamlit.components.v1 import html
+
+# 💫 ラメエフェクト
+html("""
+<div id="glitter-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></div>
+
+<script>
+const container = document.getElementById("glitter-container");
+
+window.addEventListener("scroll", () => {
+  for (let i = 0; i < 4; i++) {
+    const sparkle = document.createElement("div");
+    sparkle.style.position = "absolute";
+    sparkle.style.width = "6px";
+    sparkle.style.height = "6px";
+    sparkle.style.borderRadius = "50%";
+    sparkle.style.background = "linear-gradient(45deg, #fff, #ffc0cb, #add8e6)";
+    sparkle.style.top = `${window.scrollY + Math.random() * window.innerHeight}px`;
+    sparkle.style.left = `${Math.random() * window.innerWidth}px`;
+    sparkle.style.opacity = "0.8";
+    sparkle.style.boxShadow = "0 0 8px white";
+    sparkle.style.animation = "fadeout 2s ease-out forwards";
+    container.appendChild(sparkle);
+    setTimeout(() => {
+      sparkle.remove();
+    }, 2000);
+  }
+});
+
+const style = document.createElement("style");
+style.textContent = `
+@keyframes fadeout {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(0.5); opacity: 0; }
+}`;
+document.head.appendChild(style);
+</script>
+""", height=0)
+
+# 🎉 アプリ本体
+st.title("🌏 愛輝！世界の代表メディア 最新ニュース")
+st.markdown("翻訳付きで各国メディアのトップ記事をチェックできます。")
+
 import streamlit as st
 import feedparser
 from datetime import datetime
